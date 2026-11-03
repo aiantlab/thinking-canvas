@@ -1,0 +1,298 @@
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react'
+
+export type Locale = 'zh' | 'en'
+
+const STORAGE_KEY = 'thinking-canvas-locale'
+
+const dict = {
+  zh: {
+    logoTitle: 'aiantlab',
+    logoSub: 'Thinking Canvas',
+    run: '运行',
+    save: '保存',
+    export: '导出',
+    new: '新建',
+    demo: '演示',
+    quota: '额度',
+    savedHint: '已保存到本地',
+    langZh: '中',
+    langEn: 'EN',
+    nodePalette: '节点库',
+    searchNodes: '搜索节点…',
+    catAll: '全部',
+    catInput: '输入',
+    catText: '文本',
+    catControl: '控制',
+    catGenerate: '生成',
+    catOutput: '输出',
+    catVisualize: '可视化',
+    groupInput: '输入',
+    groupText: '文本 / 提示',
+    groupControl: '控制',
+    groupGeneration: '生成',
+    groupOutput: '输出',
+    groupVisualize: '可视化',
+    nodeUpload: '上传',
+    nodePrompt: '提示词',
+    nodeParams: '参数',
+    nodeGenerate: '生成',
+    nodeResult: '结果',
+    nodePreview3d: '3D 预览',
+    viewShortcuts: '查看快捷键',
+    statusNodes: '节点',
+    statusConnections: '连线',
+    autosaved: '已自动保存',
+    zoom: '缩放',
+    grid: '网格',
+    emptyTitle: '从一条生成链路开始',
+    emptyBody: '左侧添加节点并连线：参考图 → 提示词 / 参数 → 生成 → 结果。',
+    loadDemo: '载入演示节点',
+    addGenerate: '添加生成卡',
+    confirmNew: '新建画布？当前内容会被清空（本地已保存的也会清除）。',
+    model: '模型',
+    size: '尺寸',
+    status: '状态',
+    statusIdle: '就绪',
+    statusQueued: '排队中…',
+    statusGenerating: '生成中…',
+    statusDone: '已完成',
+    statusError: '失败',
+    startGenerate: '开始生成',
+    generating: '生成中…',
+    genHint: '连接参考图、提示词与参数后运行。可选 1K / 2K / 4K。',
+    modelNano2Lite: 'NanoBanana 2 Lite',
+    modelNano2: 'NanoBanana 2',
+    modelGpt25: 'GPT 2.5',
+    modelNano21: 'NanoBanana 2.1',
+    size1k: '1K',
+    size2k: '2K',
+    size4k: '4K (3840×2160)',
+    uploadTitle: '上传',
+    uploadHint: '点击或拖入图片 / 模型',
+    uploadFormats: '.png · .jpg · .obj · .glb',
+    selectFile: '选择文件',
+    clear: '清除',
+    promptTitle: '提示词',
+    scenePreset: '场景预设',
+    positive: '正向提示词',
+    negative: '负向提示词',
+    positivePh: '描述建筑、材质、光线…',
+    negativePh: '不想出现的内容…',
+    paramsTitle: '参数',
+    view: '视角',
+    style: '风格',
+    aspect: '宽高比',
+    resultTitle: '结果',
+    resultWaiting: '等待生成…',
+    resultWaitingHint: '连接左侧「生成」并运行',
+    useAsRef: '作参考再改',
+    copyPrompt: '复制提示',
+    open3d: '打开 3D 预览',
+    close3d: '关闭',
+    preview3dTitle: '3D 预览',
+    preview3dHint: '拖动旋转 · 滚轮缩放 · 右键平移',
+    preview3dNeedImage: '连接结果图或在结果卡打开预览',
+    portImage: '图像',
+    portText: '文本',
+    portParams: '参数',
+    portRef: '参考',
+    portPrompt: '提示',
+    portOut: '结果',
+    portIn: '输入',
+    sceneFacade: '建筑外立面',
+    sceneInterior: '室内空间',
+    sceneLandscape: '景观环境',
+    viewEye: '人视',
+    viewBird: '鸟瞰',
+    viewElevation: '侧立面',
+    styleModern: '现代简约',
+    styleNeoChinese: '新中式',
+    styleMinimal: '极简白',
+    styleLuxury: '轻奢',
+    styleBrutalist: '粗野主义',
+    styleScandi: '北欧',
+    labelUpload: '参考 / 户型',
+    labelPrompt: '提示词',
+    labelParams: '视角 · 风格',
+    labelGenerate: '生成',
+    labelResult: '结果',
+    labelPreview3d: '3D 预览',
+    quotaExhausted: '额度已用尽（演示）',
+    genFailed: '生成失败',
+    type3d: '类型: 3D 场景',
+    formatGltf: '格式: 图像贴图',
+  },
+  en: {
+    logoTitle: 'aiantlab',
+    logoSub: 'Thinking Canvas',
+    run: 'Run',
+    save: 'Save',
+    export: 'Export',
+    new: 'New',
+    demo: 'Demo',
+    quota: 'Quota',
+    savedHint: 'Saved locally',
+    langZh: '中',
+    langEn: 'EN',
+    nodePalette: 'Node Palette',
+    searchNodes: 'Search nodes…',
+    catAll: 'All',
+    catInput: 'Input',
+    catText: 'Text',
+    catControl: 'Control',
+    catGenerate: 'Generate',
+    catOutput: 'Output',
+    catVisualize: 'Visualize',
+    groupInput: 'INPUT',
+    groupText: 'TEXT / PROMPT',
+    groupControl: 'CONTROL',
+    groupGeneration: 'GENERATION',
+    groupOutput: 'OUTPUT',
+    groupVisualize: 'VISUALIZATION',
+    nodeUpload: 'Upload',
+    nodePrompt: 'Prompt',
+    nodeParams: 'Params',
+    nodeGenerate: 'Generate',
+    nodeResult: 'Result',
+    nodePreview3d: '3D Preview',
+    viewShortcuts: 'View Shortcuts',
+    statusNodes: 'nodes',
+    statusConnections: 'connections',
+    autosaved: 'Autosaved',
+    zoom: 'Zoom',
+    grid: 'Grid',
+    emptyTitle: 'Start with a generate chain',
+    emptyBody: 'Add nodes from the left: reference → prompt / params → generate → result.',
+    loadDemo: 'Load demo',
+    addGenerate: 'Add Generate',
+    confirmNew: 'New canvas? Current content will be cleared (including local save).',
+    model: 'Model',
+    size: 'Size',
+    status: 'Status',
+    statusIdle: 'Ready',
+    statusQueued: 'Queued…',
+    statusGenerating: 'Generating…',
+    statusDone: 'Done',
+    statusError: 'Error',
+    startGenerate: 'Generate',
+    generating: 'Generating…',
+    genHint: 'Wire reference, prompt, and params, then run. Size: 1K / 2K / 4K.',
+    modelNano2Lite: 'NanoBanana 2 Lite',
+    modelNano2: 'NanoBanana 2',
+    modelGpt25: 'GPT 2.5',
+    modelNano21: 'NanoBanana 2.1',
+    size1k: '1K',
+    size2k: '2K',
+    size4k: '4K (3840×2160)',
+    uploadTitle: 'Upload',
+    uploadHint: 'Click or drop image / model',
+    uploadFormats: '.png · .jpg · .obj · .glb',
+    selectFile: 'Choose file',
+    clear: 'Clear',
+    promptTitle: 'Prompt',
+    scenePreset: 'Scene preset',
+    positive: 'Positive',
+    negative: 'Negative',
+    positivePh: 'Describe architecture, materials, light…',
+    negativePh: 'What to avoid…',
+    paramsTitle: 'Params',
+    view: 'View',
+    style: 'Style',
+    aspect: 'Aspect',
+    resultTitle: 'Result',
+    resultWaiting: 'Waiting…',
+    resultWaitingHint: 'Connect Generate on the left and run',
+    useAsRef: 'Use as ref',
+    copyPrompt: 'Copy prompt',
+    open3d: 'Open 3D Preview',
+    close3d: 'Close',
+    preview3dTitle: '3D Preview',
+    preview3dHint: 'Drag to orbit · scroll zoom · right-drag pan',
+    preview3dNeedImage: 'Connect a result image or open from Result',
+    portImage: 'image',
+    portText: 'text',
+    portParams: 'params',
+    portRef: 'ref',
+    portPrompt: 'prompt',
+    portOut: 'out',
+    portIn: 'in',
+    sceneFacade: 'Facade',
+    sceneInterior: 'Interior',
+    sceneLandscape: 'Landscape',
+    viewEye: 'Eye-level',
+    viewBird: 'Bird-eye',
+    viewElevation: 'Elevation',
+    styleModern: 'Modern',
+    styleNeoChinese: 'Neo-Chinese',
+    styleMinimal: 'Minimal white',
+    styleLuxury: 'Light luxury',
+    styleBrutalist: 'Brutalist',
+    styleScandi: 'Scandinavian',
+    labelUpload: 'Reference',
+    labelPrompt: 'Prompt',
+    labelParams: 'View · Style',
+    labelGenerate: 'Generate',
+    labelResult: 'Result',
+    labelPreview3d: '3D Preview',
+    quotaExhausted: 'Quota exhausted (demo)',
+    genFailed: 'Generation failed',
+    type3d: 'Type: 3D Scene',
+    formatGltf: 'Format: image plane',
+  },
+} as const
+
+export type MessageKey = keyof typeof dict.zh
+
+type I18nCtx = {
+  locale: Locale
+  setLocale: (l: Locale) => void
+  t: (key: MessageKey) => string
+  toggleLocale: () => void
+}
+
+const Ctx = createContext<I18nCtx | null>(null)
+
+function loadLocale(): Locale {
+  try {
+    const v = localStorage.getItem(STORAGE_KEY)
+    if (v === 'en' || v === 'zh') return v
+  } catch {
+    /* ignore */
+  }
+  return 'zh'
+}
+
+export function LocaleProvider({ children }: { children: ReactNode }) {
+  const [locale, setLocaleState] = useState<Locale>(loadLocale)
+  const setLocale = useCallback((l: Locale) => {
+    setLocaleState(l)
+    try {
+      localStorage.setItem(STORAGE_KEY, l)
+    } catch {
+      /* ignore */
+    }
+    document.documentElement.lang = l === 'zh' ? 'zh-CN' : 'en'
+  }, [])
+  const toggleLocale = useCallback(() => {
+    setLocale(locale === 'zh' ? 'en' : 'zh')
+  }, [locale, setLocale])
+  const t = useCallback((key: MessageKey) => dict[locale][key] ?? dict.zh[key] ?? key, [locale])
+  const value = useMemo(
+    () => ({ locale, setLocale, t, toggleLocale }),
+    [locale, setLocale, t, toggleLocale],
+  )
+  return <Ctx.Provider value={value}>{children}</Ctx.Provider>
+}
+
+export function useI18n() {
+  const ctx = useContext(Ctx)
+  if (!ctx) throw new Error('useI18n outside LocaleProvider')
+  return ctx
+}
