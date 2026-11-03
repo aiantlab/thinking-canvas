@@ -104,7 +104,7 @@ export function GenerateNode({
           </div>
         ) : null}
         <div className="text-[10px] leading-relaxed text-muted">
-          连接参考图、提示词与参数后运行。默认走速创 NanoBanana2（2K）；设 VITE_USE_MOCK=1 可回退占位图。
+          连接参考图、提示词与参数后运行。默认 4K；设 VITE_USE_MOCK=1 可回退占位图。
         </div>
         <button
           type="button"
