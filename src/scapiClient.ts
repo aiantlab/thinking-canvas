@@ -1,15 +1,17 @@
 /**
  * Browser client for SCAPI proxy (Vite middleware locally, Worker in prod).
  * Never import API keys here — signing stays server-side.
- *
- * Deployed Workers may return taskId with imageUrl:null (timeout budget);
- * this client polls /api/scapi/detail until an image URL or failure.
  */
+
+import type { ImageSize, ModelId } from './models'
+import { DEFAULT_MODEL, DEFAULT_SIZE } from './models'
 
 export type ScapiGenerateRequest = {
   prompt: string
-  size?: '1K' | '2K' | '4K' | string
+  size?: ImageSize | string
   aspectRatio?: string
+  model?: ModelId | string
+  endpoint?: string
   /** Public https reference */
   refUrl?: string
   /** Same-origin path like /demo/line_sketch.png */
@@ -92,12 +94,15 @@ export async function scapiGenerate(
   req: ScapiGenerateRequest,
   opts?: { signal?: AbortSignal },
 ): Promise<ScapiGenerateResult> {
-  // Prefer wait:false so Worker returns quickly; fall back to polling detail.
-  // If server still waits briefly and returns imageUrl, use it immediately.
   const res = await fetch(`${apiBase()}/api/scapi/generate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ size: '4K', ...req, wait: false }),
+    body: JSON.stringify({
+      size: DEFAULT_SIZE,
+      model: DEFAULT_MODEL,
+      ...req,
+      wait: false,
+    }),
     signal: opts?.signal,
   })
   const data = (await res.json().catch(() => ({}))) as {
@@ -126,7 +131,6 @@ export function pickRefForScapi(imageUrl?: string): {
   if (!imageUrl) return {}
   if (/^https?:\/\//i.test(imageUrl)) return { refUrl: imageUrl }
   if (imageUrl.startsWith('/demo/')) return { refPath: imageUrl }
-  // blob: / data: — SCAPI needs a public URL; skip urls
   return {}
 }
 
