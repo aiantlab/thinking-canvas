@@ -2,22 +2,24 @@
 @import "@xyflow/react/dist/style.css";
 
 @theme {
-  --color-canvas: #0c0c0e;
-  --color-panel: #1e1e22;
-  --color-panel-2: #2a2a2e;
-  --color-panel-3: #161618;
-  --color-header: #252528;
-  --color-border: #3a3a40;
-  --color-border-soft: #2e2e33;
-  --color-gold: #d4a84b;
-  --color-gold-dim: #8a7048;
-  --color-mint: #4ec9b0;
-  --color-mint-dim: #2a8a74;
-  --color-violet: #9b8cff;
-  --color-amber: #f0b429;
-  --color-ink: #e6e6e8;
-  --color-muted: #9a9aa3;
-  --color-danger: #f07178;
+  --color-canvas: #f4f5f7;
+  --color-panel: #ffffff;
+  --color-panel-2: #f7f8fa;
+  --color-panel-3: #eef0f4;
+  --color-header: #ffffff;
+  --color-border: #e2e5eb;
+  --color-border-soft: #eceef2;
+  --color-gold: #3b82f6;
+  --color-gold-dim: #2563eb;
+  --color-mint: #14b8a6;
+  --color-mint-dim: #0d9488;
+  --color-violet: #8b5cf6;
+  --color-amber: #f59e0b;
+  --color-rose: #f43f5e;
+  --color-sky: #0ea5e9;
+  --color-ink: #111827;
+  --color-muted: #6b7280;
+  --color-danger: #ef4444;
   --font-sans: "PingFang SC", "Noto Sans SC", "Segoe UI", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
 }
@@ -34,7 +36,6 @@ body,
   -webkit-font-smoothing: antialiased;
 }
 
-/* —— Canvas / React Flow —— */
 .react-flow {
   --xy-background-color: var(--color-canvas);
 }
@@ -46,9 +47,9 @@ body,
 .react-flow__controls {
   background: var(--color-panel) !important;
   border: 1px solid var(--color-border) !important;
-  border-radius: 6px !important;
+  border-radius: 10px !important;
   overflow: hidden;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
 }
 
 .react-flow__controls-button {
@@ -64,26 +65,25 @@ body,
 }
 
 .react-flow__minimap {
-  background: #141416 !important;
+  background: #ffffff !important;
   border: 1px solid var(--color-border) !important;
-  border-radius: 6px !important;
+  border-radius: 12px !important;
   overflow: hidden;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.1);
 }
 
-/* Edges — ComfyUI-like soft glow bezier */
 .react-flow__edge-path {
-  stroke: #6a6a78;
-  stroke-width: 2.25;
-  filter: drop-shadow(0 0 1.5px rgba(140, 140, 160, 0.35));
+  stroke: #94a3b8;
+  stroke-width: 2.5;
+  filter: drop-shadow(0 1px 1px rgba(148, 163, 184, 0.35));
 }
 
 .react-flow__edge.selected .react-flow__edge-path,
 .react-flow__edge:focus .react-flow__edge-path,
 .react-flow__edge.selectable:focus .react-flow__edge-path {
   stroke: var(--color-gold);
-  stroke-width: 2.75;
-  filter: drop-shadow(0 0 3px rgba(212, 168, 75, 0.55));
+  stroke-width: 3;
+  filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.45));
 }
 
 .react-flow__edge.updating .react-flow__edge-path {
@@ -92,57 +92,49 @@ body,
 
 .react-flow__connection-line {
   stroke: var(--color-gold) !important;
-  stroke-width: 2 !important;
-  filter: drop-shadow(0 0 3px rgba(212, 168, 75, 0.5));
+  stroke-width: 2.25 !important;
+  filter: drop-shadow(0 0 3px rgba(59, 130, 246, 0.4));
 }
 
-/* Handles — larger, punchy ComfyUI sockets */
 .react-flow__handle {
-  width: 12px !important;
-  height: 12px !important;
-  border: 2px solid #0c0c0e !important;
-  background: #c8c8d0 !important;
+  width: 14px !important;
+  height: 14px !important;
+  border: 2.5px solid #ffffff !important;
+  background: #94a3b8 !important;
   border-radius: 50% !important;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.12);
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
 .react-flow__handle:hover {
-  transform: scale(1.25);
-  box-shadow: 0 0 0 2px rgba(212, 168, 75, 0.45);
+  transform: scale(1.2);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
 }
 
 .react-flow__handle-connecting {
   background: var(--color-mint) !important;
-  box-shadow: 0 0 0 3px rgba(78, 201, 176, 0.35);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.3);
 }
 
 .react-flow__handle-valid {
   background: var(--color-mint) !important;
 }
 
-/* Node selection / hover */
 .react-flow__node {
   transition: filter 0.12s ease;
 }
 
 .react-flow__node:hover .node-shell {
-  border-color: #505058;
+  border-color: #cbd5e1;
 }
 
 .react-flow__node.selected .node-shell {
   border-color: var(--color-gold) !important;
   box-shadow:
-    0 0 0 1px rgba(212, 168, 75, 0.55),
-    0 10px 28px rgba(0, 0, 0, 0.55),
-    0 0 18px rgba(212, 168, 75, 0.12);
+    0 0 0 1px rgba(59, 130, 246, 0.35),
+    0 14px 32px rgba(15, 23, 42, 0.12);
 }
 
-.react-flow__node.selected .node-shell::before {
-  opacity: 1;
-}
-
-/* Executing pulse on generate node */
 .node-shell.is-running {
   animation: node-pulse 1.4s ease-in-out infinite;
 }
@@ -150,25 +142,14 @@ body,
 @keyframes node-pulse {
   0%,
   100% {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(240, 180, 41, 0.25);
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(245, 158, 11, 0.25);
   }
   50% {
-    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(240, 180, 41, 0.55),
-      0 0 16px rgba(240, 180, 41, 0.2);
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.1), 0 0 0 2px rgba(245, 158, 11, 0.45),
+      0 0 18px rgba(245, 158, 11, 0.18);
   }
 }
 
-@keyframes handle-glow {
-  0%,
-  100% {
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
-  }
-  50% {
-    box-shadow: 0 0 0 3px rgba(212, 168, 75, 0.35);
-  }
-}
-
-/* Socket color helpers used via inline / class */
 .handle-mint {
   background: var(--color-mint) !important;
 }
@@ -181,11 +162,16 @@ body,
 .handle-amber {
   background: var(--color-amber) !important;
 }
+.handle-sky {
+  background: var(--color-sky) !important;
+}
+.handle-rose {
+  background: var(--color-rose) !important;
+}
 .handle-ink {
-  background: #c8c8d0 !important;
+  background: #64748b !important;
 }
 
-/* Port labels beside handles */
 .port-label {
   position: absolute;
   font-size: 9px;
@@ -209,21 +195,40 @@ body,
   transform: translateY(-50%);
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #3a3a40;
+  background: #cbd5e1;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 
-/* Native selects / inputs dark */
 select option {
-  background: #1e1e22;
-  color: #e6e6e8;
+  background: #ffffff;
+  color: #111827;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-rows: 56px 1fr 32px;
+  height: 100%;
+  width: 100%;
+  background: var(--color-canvas);
+}
+
+.app-main {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: 0;
+  position: relative;
+}
+
+.canvas-wrap {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
 }
