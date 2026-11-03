@@ -6,9 +6,11 @@ import type {
   ViewAngle,
 } from '../../types'
 import { ASPECT_OPTIONS, STYLE_OPTIONS, VIEW_OPTIONS } from '../../types'
+import { useI18n } from '../../i18n'
 import { FieldLabel, NodeShell, selectClass } from './nodeShell'
 
 export function ParamsNode({ id, data }: NodeProps<ParamsNodeType>) {
+  const { t } = useI18n()
   const { setNodes } = useReactFlow()
 
   const update = (patch: Partial<typeof data>) => {
@@ -20,12 +22,12 @@ export function ParamsNode({ id, data }: NodeProps<ParamsNodeType>) {
   return (
     <div className="relative">
       <NodeShell
-        title={data.label || '视角 · 风格'}
-        accent="#9b8cff"
+        title={data.label || t('paramsTitle')}
+        accent="#8b5cf6"
         badge="PARAMS"
-        icon={<span className="text-[11px] text-violet">◈</span>}
+        icon={<span className="text-[12px] text-violet">◈</span>}
       >
-        <FieldLabel>视角</FieldLabel>
+        <FieldLabel>{t('view')}</FieldLabel>
         <select
           className={selectClass}
           value={data.view}
@@ -33,11 +35,11 @@ export function ParamsNode({ id, data }: NodeProps<ParamsNodeType>) {
         >
           {VIEW_OPTIONS.map((o) => (
             <option key={o.id} value={o.id}>
-              {o.label}
+              {t(o.labelKey)}
             </option>
           ))}
         </select>
-        <FieldLabel>风格</FieldLabel>
+        <FieldLabel>{t('style')}</FieldLabel>
         <select
           className={selectClass}
           value={data.style}
@@ -45,11 +47,11 @@ export function ParamsNode({ id, data }: NodeProps<ParamsNodeType>) {
         >
           {STYLE_OPTIONS.map((o) => (
             <option key={o.id} value={o.id}>
-              {o.label}
+              {t(o.labelKey)}
             </option>
           ))}
         </select>
-        <FieldLabel>宽高比</FieldLabel>
+        <FieldLabel>{t('aspect')}</FieldLabel>
         <select
           className={selectClass}
           value={data.aspect}
@@ -62,18 +64,9 @@ export function ParamsNode({ id, data }: NodeProps<ParamsNodeType>) {
           ))}
         </select>
       </NodeShell>
-      <Handle
-        type="source"
-        position={Position.Right}
-        id="out"
-        className="handle-violet"
-        style={{ top: '50%' }}
-      />
-      <span
-        className="port-label right pointer-events-none absolute"
-        style={{ right: -6, top: '50%', transform: 'translate(100%, -50%)' }}
-      >
-        参数
+      <Handle type="source" position={Position.Right} id="out" className="handle-violet" style={{ top: '50%' }} />
+      <span className="port-label right pointer-events-none absolute" style={{ right: -6, top: '50%', transform: 'translate(100%, -50%)' }}>
+        {t('portParams')}
       </span>
     </div>
   )
