@@ -1,4 +1,5 @@
 import type { Edge, Node } from '@xyflow/react'
+import type { ImageSize, ModelId } from './models'
 
 export type ScenePreset = 'facade' | 'interior' | 'landscape'
 export type ViewAngle = 'eye' | 'bird' | 'elevation'
@@ -38,6 +39,8 @@ export type GenerateNodeData = {
   status: GenStatus
   progress?: number
   lastError?: string
+  model?: ModelId
+  size?: ImageSize
 }
 
 export type ResultNodeData = {
@@ -48,18 +51,25 @@ export type ResultNodeData = {
   status: 'ready' | 'placeholder'
 }
 
+export type Preview3DNodeData = {
+  label: string
+  imageUrl?: string
+}
+
 export type CanvasNodeData =
   | UploadNodeData
   | PromptNodeData
   | ParamsNodeData
   | GenerateNodeData
   | ResultNodeData
+  | Preview3DNodeData
 
 export type UploadNode = Node<UploadNodeData, 'upload'>
 export type PromptNode = Node<PromptNodeData, 'prompt'>
 export type ParamsNode = Node<ParamsNodeData, 'params'>
 export type GenerateNode = Node<GenerateNodeData, 'generate'>
 export type ResultNode = Node<ResultNodeData, 'result'>
+export type Preview3DNode = Node<Preview3DNodeData, 'preview3d'>
 
 export type CanvasNode =
   | UploadNode
@@ -67,28 +77,40 @@ export type CanvasNode =
   | ParamsNode
   | GenerateNode
   | ResultNode
+  | Preview3DNode
 
 export type CanvasEdge = Edge
 
-export const SCENE_PRESETS: { id: ScenePreset; label: string }[] = [
-  { id: 'facade', label: '建筑外立面' },
-  { id: 'interior', label: '室内空间' },
-  { id: 'landscape', label: '景观环境' },
+export type NodeKind = 'upload' | 'prompt' | 'params' | 'generate' | 'result' | 'preview3d'
+
+export const SCENE_PRESETS: { id: ScenePreset; labelKey: 'sceneFacade' | 'sceneInterior' | 'sceneLandscape' }[] = [
+  { id: 'facade', labelKey: 'sceneFacade' },
+  { id: 'interior', labelKey: 'sceneInterior' },
+  { id: 'landscape', labelKey: 'sceneLandscape' },
 ]
 
-export const VIEW_OPTIONS: { id: ViewAngle; label: string }[] = [
-  { id: 'eye', label: '人视' },
-  { id: 'bird', label: '鸟瞰' },
-  { id: 'elevation', label: '侧立面' },
+export const VIEW_OPTIONS: { id: ViewAngle; labelKey: 'viewEye' | 'viewBird' | 'viewElevation' }[] = [
+  { id: 'eye', labelKey: 'viewEye' },
+  { id: 'bird', labelKey: 'viewBird' },
+  { id: 'elevation', labelKey: 'viewElevation' },
 ]
 
-export const STYLE_OPTIONS: { id: StylePreset; label: string }[] = [
-  { id: 'modern', label: '现代简约' },
-  { id: 'neo-chinese', label: '新中式' },
-  { id: 'minimal', label: '极简白' },
-  { id: 'luxury', label: '轻奢' },
-  { id: 'brutalist', label: '粗野主义' },
-  { id: 'scandi', label: '北欧' },
+export const STYLE_OPTIONS: {
+  id: StylePreset
+  labelKey:
+    | 'styleModern'
+    | 'styleNeoChinese'
+    | 'styleMinimal'
+    | 'styleLuxury'
+    | 'styleBrutalist'
+    | 'styleScandi'
+}[] = [
+  { id: 'modern', labelKey: 'styleModern' },
+  { id: 'neo-chinese', labelKey: 'styleNeoChinese' },
+  { id: 'minimal', labelKey: 'styleMinimal' },
+  { id: 'luxury', labelKey: 'styleLuxury' },
+  { id: 'brutalist', labelKey: 'styleBrutalist' },
+  { id: 'scandi', labelKey: 'styleScandi' },
 ]
 
 export const ASPECT_OPTIONS: { id: AspectRatio; label: string }[] = [
