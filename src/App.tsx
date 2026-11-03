@@ -328,7 +328,7 @@ function CanvasInner() {
             view === 'bird' ? 'aerial bird-eye view' : view === 'elevation' ? 'side elevation view' : 'eye-level perspective'
           const result = await scapiGenerate({
             prompt: `${positive}, ${styleHint}, ${viewHint}`,
-            size: '2K',
+            size: '4K',
             aspectRatio: aspect,
             ...refPick,
           })
