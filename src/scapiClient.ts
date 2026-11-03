@@ -52,7 +52,7 @@ async function pollDetail(
       raw?: { data?: { message?: string }; msg?: string }
     }
     if (!res.ok) {
-      throw new Error(data.error || `速创查询失败 (${res.status})`)
+      throw new Error(data.error || `生图查询失败 (${res.status})`)
     }
     if (data.imageUrl) {
       return { imageUrl: data.imageUrl, taskId }
@@ -69,7 +69,7 @@ async function pollDetail(
         data.error ||
         data.raw?.data?.message ||
         data.raw?.msg ||
-        '速创生成失败'
+        '生图生成失败'
       throw new Error(msg)
     }
     await new Promise((r) => setTimeout(r, DETAIL_POLL_MS))
@@ -86,7 +86,7 @@ export async function scapiGenerate(
   const res = await fetch('/api/scapi/generate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ size: '1K', ...req, wait: false }),
+    body: JSON.stringify({ size: '4K', ...req, wait: false }),
     signal: opts?.signal,
   })
   const data = (await res.json().catch(() => ({}))) as {
@@ -96,10 +96,10 @@ export async function scapiGenerate(
     pending?: boolean
   }
   if (!res.ok) {
-    throw new Error(data.error || `速创请求失败 (${res.status})`)
+    throw new Error(data.error || `生图请求失败 (${res.status})`)
   }
   if (!data.taskId) {
-    throw new Error(data.error || '速创未返回 task id')
+    throw new Error(data.error || '未返回任务 id')
   }
   if (data.imageUrl) {
     return { imageUrl: data.imageUrl, taskId: data.taskId }
