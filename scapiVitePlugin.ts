@@ -14,8 +14,26 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { Plugin } from 'vite'
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url))
-const SUBMIT = 'https://api.scapi.net/api/async/image_nanoBanana2'
+const MODEL_ENDPOINTS: Record<string, string> = {
+  image_nanoBanana2Lite: 'https://api.scapi.net/api/async/image_nanoBanana2Lite',
+  image_nanoBanana2: 'https://api.scapi.net/api/async/image_nanoBanana2',
+  'image_gpt_2.5': 'https://api.scapi.net/api/async/image_gpt_2.5',
+  'NanoBanana2.1': 'https://api.scapi.net/api/async/NanoBanana2.1',
+}
+const DEFAULT_SUBMIT = MODEL_ENDPOINTS.image_nanoBanana2Lite
 const DETAIL = 'https://api.scapi.net/api/async/detail'
+
+function resolveSubmitUrl(body: { model?: string; endpoint?: string }): string {
+  if (typeof body.endpoint === 'string' && body.endpoint.startsWith('https://api.scapi.net/api/async/')) {
+    return body.endpoint
+  }
+  const model = typeof body.model === 'string' ? body.model : ''
+  if (model && MODEL_ENDPOINTS[model]) return MODEL_ENDPOINTS[model]
+  if (model && !model.includes('://')) {
+    return `https://api.scapi.net/api/async/${model}`
+  }
+  return DEFAULT_SUBMIT
+}
 const DEFAULT_SIZE = '4K'
 const DEFAULT_ASPECT = '16:9'
 const POLL_MS = 4000
@@ -25,6 +43,8 @@ type GenerateBody = {
   prompt?: string
   size?: string
   aspectRatio?: string
+  model?: string
+  endpoint?: string
   /** Public https reference image(s) */
   urls?: string[]
   /** Same-origin demo path e.g. /demo/line_sketch.png */
@@ -210,7 +230,7 @@ async function pollUntilDone(
 
 export function scapiVitePlugin(): Plugin {
   return {
-    name: 'scapi-nanobanana2-proxy',
+    name: 'scapi-image-proxy',
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         try {
@@ -273,7 +293,8 @@ export function scapiVitePlugin(): Plugin {
             }
             if (urls) payload.urls = urls
 
-            const submitUrl = `${SUBMIT}?key=${encodeURIComponent(keys.key)}`
+            const submitBase = resolveSubmitUrl(body)
+            const submitUrl = `${submitBase}?key=${encodeURIComponent(keys.key)}`
             const { json } = await scapiFetch(
               'POST',
               submitUrl,
