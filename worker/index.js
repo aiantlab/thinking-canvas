@@ -2,7 +2,27 @@
  * thinking-canvas Worker: SPA assets + SCAPI SCAPI image HMAC proxy.
  * Secrets: SUCHUANG_API_KEY, SUCHUANG_SIGN_KEY
  */
-const SUBMIT = 'https://api.scapi.net/api/async/image_nanoBanana2'
+
+const MODEL_ENDPOINTS = {
+  image_nanoBanana2Lite: 'https://api.scapi.net/api/async/image_nanoBanana2Lite',
+  image_nanoBanana2: 'https://api.scapi.net/api/async/image_nanoBanana2',
+  'image_gpt_2.5': 'https://api.scapi.net/api/async/image_gpt_2.5',
+  'NanoBanana2.1': 'https://api.scapi.net/api/async/NanoBanana2.1',
+}
+const DEFAULT_SUBMIT = MODEL_ENDPOINTS.image_nanoBanana2Lite
+
+function resolveSubmitUrl(body) {
+  if (body && typeof body.endpoint === 'string' && body.endpoint.startsWith('https://api.scapi.net/api/async/')) {
+    return body.endpoint
+  }
+  const model = body && typeof body.model === 'string' ? body.model : ''
+  if (model && MODEL_ENDPOINTS[model]) return MODEL_ENDPOINTS[model]
+  if (model && !model.includes('://')) {
+    return `https://api.scapi.net/api/async/${model}`
+  }
+  return DEFAULT_SUBMIT
+}
+
 const DETAIL = 'https://api.scapi.net/api/async/detail'
 const DEFAULT_SIZE = '4K'
 const DEFAULT_ASPECT = '16:9'
@@ -196,7 +216,8 @@ async function handleGenerate(request, env) {
   const payload = { prompt, size, aspectRatio }
   if (urls) payload.urls = urls
 
-  const submitUrl = `${SUBMIT}?key=${encodeURIComponent(key)}`
+  const submitBase = resolveSubmitUrl(body)
+  const submitUrl = `${submitBase}?key=${encodeURIComponent(key)}`
   const { json: submitted } = await scapiFetch(
     'POST',
     submitUrl,
