@@ -1,5 +1,5 @@
 /**
- * Local Vite middleware that proxies NanoBanana2 (速创 SCAPI).
+ * Local Vite middleware that proxies SCAPI image generate.
  * Keys stay in process env (SUCHUANG_API_KEY / SUCHUANG_SIGN_KEY) — never in src/ or VITE_*.
  *
  * Local /demo/* refs are not reachable by SCAPI. We map known demo files to previously
@@ -16,7 +16,7 @@ import type { Plugin } from 'vite'
 const ROOT = path.dirname(fileURLToPath(import.meta.url))
 const SUBMIT = 'https://api.scapi.net/api/async/image_nanoBanana2'
 const DETAIL = 'https://api.scapi.net/api/async/detail'
-const DEFAULT_SIZE = '2K'
+const DEFAULT_SIZE = '4K'
 const DEFAULT_ASPECT = '16:9'
 const POLL_MS = 4000
 const POLL_TIMEOUT_MS = 10 * 60 * 1000
@@ -200,7 +200,7 @@ async function pollUntilDone(
       const msg =
         (typeof data.message === 'string' && data.message) ||
         (typeof json.msg === 'string' && json.msg) ||
-        '速创生成失败'
+        '生图生成失败'
       return { taskId, raw: json, error: msg }
     }
     await new Promise((r) => setTimeout(r, POLL_MS))
@@ -230,7 +230,7 @@ export function scapiVitePlugin(): Plugin {
           const keys = getKeys()
           if (!keys) {
             sendJson(res, 503, {
-              error: '缺少 SUCHUANG_API_KEY / SUCHUANG_SIGN_KEY，无法调用速创',
+              error: '缺少 SUCHUANG_API_KEY / SUCHUANG_SIGN_KEY，无法调用生图服务',
               code: 'NO_KEYS',
             })
             return
@@ -285,7 +285,7 @@ export function scapiVitePlugin(): Plugin {
             if (code !== 200 && code !== '200') {
               const msg =
                 (typeof json.msg === 'string' && json.msg) ||
-                '速创提交失败'
+                '生图提交失败'
               sendJson(res, 502, { error: msg, raw: json })
               return
             }
