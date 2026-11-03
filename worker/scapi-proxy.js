@@ -1,12 +1,12 @@
 /**
- * Cloudflare Worker: static ASSETS + SCAPI NanoBanana2 proxy.
+ * Cloudflare Worker: static ASSETS + SCAPI image proxy.
  * Secrets: SUCHUANG_API_KEY, SUCHUANG_SIGN_KEY (Worker secret_text bindings).
  * Mirrors local Vite middleware in scapiVitePlugin.ts.
  */
 
 const SUBMIT = 'https://api.scapi.net/api/async/image_nanoBanana2'
 const DETAIL = 'https://api.scapi.net/api/async/detail'
-const DEFAULT_SIZE = '2K'
+const DEFAULT_SIZE = '4K'
 const DEFAULT_ASPECT = '16:9'
 const POLL_MS = 4000
 const POLL_TIMEOUT_MS = 10 * 60 * 1000
@@ -146,7 +146,7 @@ async function pollUntilDone(taskId, key, secret) {
       const msg =
         (typeof data.message === 'string' && data.message) ||
         (typeof json.msg === 'string' && json.msg) ||
-        '速创生成失败'
+        '生图生成失败'
       return { taskId, raw: json, error: msg }
     }
     await sleep(POLL_MS)
@@ -171,7 +171,7 @@ async function handleScapi(request, env) {
   const keys = getKeys(env)
   if (!keys) {
     return jsonResponse(503, {
-      error: '缺少 SUCHUANG_API_KEY / SUCHUANG_SIGN_KEY，无法调用速创',
+      error: '缺少 SUCHUANG_API_KEY / SUCHUANG_SIGN_KEY，无法调用生图服务',
       code: 'NO_KEYS',
     })
   }
@@ -211,7 +211,7 @@ async function handleScapi(request, env) {
     const { json } = await scapiFetch('POST', submitUrl, keys.key, keys.secret, payload)
     const code = json.code
     if (code !== 200 && code !== '200') {
-      const msg = (typeof json.msg === 'string' && json.msg) || '速创提交失败'
+      const msg = (typeof json.msg === 'string' && json.msg) || '生图提交失败'
       return jsonResponse(502, { error: msg, raw: json })
     }
     const data = json.data ?? {}
