@@ -57,9 +57,9 @@ src/
 - 上传图仅浏览器本地预览（blob URL），刷新后需重新选择（除非整图已进结果 SVG）
 - 桌面 Chrome 优先；移动端未专门适配
 
-## 速创 NanoBanana2（「开始生成」）
+## 真实生图（「开始生成」）
 
-开发态通过 Vite 中间件代理调用 SCAPI，密钥只用进程环境变量 `SUCHUANG_API_KEY` / `SUCHUANG_SIGN_KEY`，不会进前端。
+开发态通过 Vite 中间件代理调用后端生图接口，密钥只用进程 / Worker 环境变量（见 `worker` 中的 secrets 绑定），不会进前端。
 
 ```bash
 cd /workspace/thinking-canvas
@@ -72,4 +72,4 @@ curl -sS -X POST http://127.0.0.1:5173/api/scapi/generate \
   -d '{"prompt":"modern villa exterior","size":"1K","aspectRatio":"16:9"}'
 ```
 
-本地 `/demo/line_sketch.png` 会映射到 `output/line_to_render_meta.json` 里的公开 `line_url`；任意 blob/data 参考图无法被 SCAPI 拉取，会退化为纯文生图。设 `VITE_USE_MOCK=1` 可回退占位图。
+本地 `/demo/line_sketch.png` 会映射到 `output/line_to_render_meta.json` 里的公开 `line_url`；任意 blob/data 参考图无法被远端接口拉取，会退化为纯文生图。设 `VITE_USE_MOCK=1` 可回退占位图。
