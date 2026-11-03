@@ -1,0 +1,229 @@
+@import "tailwindcss";
+@import "@xyflow/react/dist/style.css";
+
+@theme {
+  --color-canvas: #0c0c0e;
+  --color-panel: #1e1e22;
+  --color-panel-2: #2a2a2e;
+  --color-panel-3: #161618;
+  --color-header: #252528;
+  --color-border: #3a3a40;
+  --color-border-soft: #2e2e33;
+  --color-gold: #d4a84b;
+  --color-gold-dim: #8a7048;
+  --color-mint: #4ec9b0;
+  --color-mint-dim: #2a8a74;
+  --color-violet: #9b8cff;
+  --color-amber: #f0b429;
+  --color-ink: #e6e6e8;
+  --color-muted: #9a9aa3;
+  --color-danger: #f07178;
+  --font-sans: "PingFang SC", "Noto Sans SC", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* —— Canvas / React Flow —— */
+.react-flow {
+  --xy-background-color: var(--color-canvas);
+}
+
+.react-flow__background {
+  background: var(--color-canvas) !important;
+}
+
+.react-flow__controls {
+  background: var(--color-panel) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 6px !important;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+}
+
+.react-flow__controls-button {
+  background: var(--color-panel) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+  fill: var(--color-ink) !important;
+  width: 28px !important;
+  height: 28px !important;
+}
+
+.react-flow__controls-button:hover {
+  background: var(--color-panel-2) !important;
+}
+
+.react-flow__minimap {
+  background: #141416 !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 6px !important;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+}
+
+/* Edges — ComfyUI-like soft glow bezier */
+.react-flow__edge-path {
+  stroke: #6a6a78;
+  stroke-width: 2.25;
+  filter: drop-shadow(0 0 1.5px rgba(140, 140, 160, 0.35));
+}
+
+.react-flow__edge.selected .react-flow__edge-path,
+.react-flow__edge:focus .react-flow__edge-path,
+.react-flow__edge.selectable:focus .react-flow__edge-path {
+  stroke: var(--color-gold);
+  stroke-width: 2.75;
+  filter: drop-shadow(0 0 3px rgba(212, 168, 75, 0.55));
+}
+
+.react-flow__edge.updating .react-flow__edge-path {
+  stroke: var(--color-mint);
+}
+
+.react-flow__connection-line {
+  stroke: var(--color-gold) !important;
+  stroke-width: 2 !important;
+  filter: drop-shadow(0 0 3px rgba(212, 168, 75, 0.5));
+}
+
+/* Handles — larger, punchy ComfyUI sockets */
+.react-flow__handle {
+  width: 12px !important;
+  height: 12px !important;
+  border: 2px solid #0c0c0e !important;
+  background: #c8c8d0 !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.react-flow__handle:hover {
+  transform: scale(1.25);
+  box-shadow: 0 0 0 2px rgba(212, 168, 75, 0.45);
+}
+
+.react-flow__handle-connecting {
+  background: var(--color-mint) !important;
+  box-shadow: 0 0 0 3px rgba(78, 201, 176, 0.35);
+}
+
+.react-flow__handle-valid {
+  background: var(--color-mint) !important;
+}
+
+/* Node selection / hover */
+.react-flow__node {
+  transition: filter 0.12s ease;
+}
+
+.react-flow__node:hover .node-shell {
+  border-color: #505058;
+}
+
+.react-flow__node.selected .node-shell {
+  border-color: var(--color-gold) !important;
+  box-shadow:
+    0 0 0 1px rgba(212, 168, 75, 0.55),
+    0 10px 28px rgba(0, 0, 0, 0.55),
+    0 0 18px rgba(212, 168, 75, 0.12);
+}
+
+.react-flow__node.selected .node-shell::before {
+  opacity: 1;
+}
+
+/* Executing pulse on generate node */
+.node-shell.is-running {
+  animation: node-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes node-pulse {
+  0%,
+  100% {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(240, 180, 41, 0.25);
+  }
+  50% {
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(240, 180, 41, 0.55),
+      0 0 16px rgba(240, 180, 41, 0.2);
+  }
+}
+
+@keyframes handle-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+  }
+  50% {
+    box-shadow: 0 0 0 3px rgba(212, 168, 75, 0.35);
+  }
+}
+
+/* Socket color helpers used via inline / class */
+.handle-mint {
+  background: var(--color-mint) !important;
+}
+.handle-gold {
+  background: var(--color-gold) !important;
+}
+.handle-violet {
+  background: var(--color-violet) !important;
+}
+.handle-amber {
+  background: var(--color-amber) !important;
+}
+.handle-ink {
+  background: #c8c8d0 !important;
+}
+
+/* Port labels beside handles */
+.port-label {
+  position: absolute;
+  font-size: 9px;
+  line-height: 1;
+  color: var(--color-muted);
+  pointer-events: none;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+  font-family: var(--font-sans);
+}
+
+.port-label.left {
+  right: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.port-label.right {
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: #3a3a40;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Native selects / inputs dark */
+select option {
+  background: #1e1e22;
+  color: #e6e6e8;
+}
