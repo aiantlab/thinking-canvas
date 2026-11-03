@@ -26,6 +26,17 @@ export type ScapiGenerateResult = {
 const DETAIL_POLL_MS = 3500
 const DETAIL_TIMEOUT_MS = 10 * 60 * 1000
 
+/** On GitHub Pages (static), POST /api 405s — call Workers origin instead. */
+function apiBase(): string {
+  if (typeof location !== 'undefined') {
+    const host = location.hostname
+    if (host === 'aiantlab.github.io' || host.endsWith('.github.io')) {
+      return 'https://thinking-canvas.yeahsky.workers.dev'
+    }
+  }
+  return ''
+}
+
 function useMock(): boolean {
   return import.meta.env.VITE_USE_MOCK === '1' || import.meta.env.VITE_USE_MOCK === 'true'
 }
@@ -42,7 +53,7 @@ async function pollDetail(
   while (Date.now() - t0 < DETAIL_TIMEOUT_MS) {
     if (signal?.aborted) throw new DOMException('Aborted', 'AbortError')
     const res = await fetch(
-      `/api/scapi/detail?id=${encodeURIComponent(taskId)}`,
+      `${apiBase()}/api/scapi/detail?id=${encodeURIComponent(taskId)}`,
       { signal },
     )
     const data = (await res.json().catch(() => ({}))) as {
@@ -83,7 +94,7 @@ export async function scapiGenerate(
 ): Promise<ScapiGenerateResult> {
   // Prefer wait:false so Worker returns quickly; fall back to polling detail.
   // If server still waits briefly and returns imageUrl, use it immediately.
-  const res = await fetch('/api/scapi/generate', {
+  const res = await fetch(`${apiBase()}/api/scapi/generate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ size: '4K', ...req, wait: false }),
