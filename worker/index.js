@@ -1,10 +1,10 @@
 /**
- * thinking-canvas Worker: SPA assets + SCAPI NanoBanana2 HMAC proxy.
+ * thinking-canvas Worker: SPA assets + SCAPI SCAPI image HMAC proxy.
  * Secrets: SUCHUANG_API_KEY, SUCHUANG_SIGN_KEY
  */
 const SUBMIT = 'https://api.scapi.net/api/async/image_nanoBanana2'
 const DETAIL = 'https://api.scapi.net/api/async/detail'
-const DEFAULT_SIZE = '2K'
+const DEFAULT_SIZE = '4K'
 const DEFAULT_ASPECT = '16:9'
 const POLL_MS = 3000
 const WORKER_POLL_BUDGET_MS = 22000
@@ -154,7 +154,7 @@ async function pollUntilDone(taskId, key, secret, budgetMs) {
       const msg =
         (typeof data.message === 'string' && data.message) ||
         (typeof json.msg === 'string' && json.msg) ||
-        '速创生成失败'
+        '生图生成失败'
       return { taskId, raw: json, error: msg }
     }
     await new Promise((r) => setTimeout(r, POLL_MS))
@@ -167,7 +167,7 @@ async function handleGenerate(request, env) {
   const secret = (env.SUCHUANG_SIGN_KEY || '').trim()
   if (!key || !secret) {
     return json(503, {
-      error: '缺少 SUCHUANG_API_KEY / SUCHUANG_SIGN_KEY，无法调用速创',
+      error: '缺少 SUCHUANG_API_KEY / SUCHUANG_SIGN_KEY，无法调用生图服务',
       code: 'NO_KEYS',
     })
   }
@@ -207,7 +207,7 @@ async function handleGenerate(request, env) {
   const code = submitted.code
   if (code !== 200 && code !== '200') {
     const msg =
-      (typeof submitted.msg === 'string' && submitted.msg) || '速创提交失败'
+      (typeof submitted.msg === 'string' && submitted.msg) || '生图提交失败'
     return json(502, { error: msg, raw: submitted })
   }
   const data = submitted.data ?? {}
