@@ -9,6 +9,7 @@ import {
   useEdgesState,
   useNodesState,
   useReactFlow,
+  useStore,
   type Connection,
   type Edge,
   type Node,
@@ -17,15 +18,20 @@ import {
 } from '@xyflow/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { EmptyState } from './components/EmptyState'
-import { Toolbar } from './components/Toolbar'
+import { NodePalette } from './components/NodePalette'
+import { Preview3DModal } from './components/Preview3DModal'
+import { StatusBar } from './components/StatusBar'
 import { TopBar } from './components/TopBar'
 import { GenerateNode } from './components/nodes/GenerateNode'
 import { ParamsNode } from './components/nodes/ParamsNode'
+import { Preview3DNode } from './components/nodes/Preview3DNode'
 import { PromptNode } from './components/nodes/PromptNode'
 import { ResultNode } from './components/nodes/ResultNode'
 import { UploadNode } from './components/nodes/UploadNode'
 import { DEMO_EDGES, DEMO_NODES } from './demoData'
+import { useI18n } from './i18n'
 import { buildPlaceholderImage, mockDelayMs, randomSeed } from './mockGenerate'
+import { DEFAULT_MODEL, DEFAULT_SIZE } from './models'
 import {
   pickRefForScapi,
   scapiGenerate,
@@ -35,6 +41,7 @@ import {
 import { clearGraph, loadGraph, loadQuota, saveGraph, saveQuota } from './storage'
 import type {
   GenerateNodeData,
+  NodeKind,
   ParamsNodeData,
   PromptNodeData,
   ResultNodeData,
@@ -59,7 +66,6 @@ function wouldCreateCycle(edges: Edge[], source: string, target: string): boolea
     list.push(e.target)
     adj.set(e.source, list)
   }
-  // pretend edge source -> target exists, see if target can reach source
   const stack = [target]
   const seen = new Set<string>()
   while (stack.length) {
@@ -72,10 +78,7 @@ function wouldCreateCycle(edges: Edge[], source: string, target: string): boolea
   return false
 }
 
-function createNode(
-  type: 'upload' | 'prompt' | 'params' | 'generate' | 'result',
-  position: { x: number; y: number },
-): Node {
+function createNode(type: NodeKind, position: { x: number; y: number }, labels: Record<string, string>): Node {
   const id = nextId(type)
   switch (type) {
     case 'upload':
@@ -83,7 +86,7 @@ function createNode(
         id,
         type,
         position,
-        data: { label: '参考 / 户型' } satisfies UploadNodeData,
+        data: { label: labels.upload },
       }
     case 'prompt': {
       const preset = PROMPT_PRESETS.facade
@@ -92,7 +95,7 @@ function createNode(
         type,
         position,
         data: {
-          label: '提示词',
+          label: labels.prompt,
           preset: 'facade',
           positive: preset.positive,
           negative: preset.negative,
@@ -105,7 +108,7 @@ function createNode(
         type,
         position,
         data: {
-          label: '视角 · 风格',
+          label: labels.params,
           view: 'eye',
           style: 'modern',
           aspect: '16:9',
@@ -116,26 +119,63 @@ function createNode(
         id,
         type,
         position,
-        data: { label: '生成', status: 'idle' } satisfies GenerateNodeData,
+        data: {
+          label: labels.generate,
+          status: 'idle',
+          model: DEFAULT_MODEL,
+          size: DEFAULT_SIZE,
+        } satisfies GenerateNodeData,
       }
     case 'result':
       return {
         id,
         type,
         position,
-        data: { label: '结果', status: 'placeholder' } satisfies ResultNodeData,
+        data: { label: labels.result, status: 'placeholder' } satisfies ResultNodeData,
+      }
+    case 'preview3d':
+      return {
+        id,
+        type,
+        position,
+        data: { label: labels.preview3d },
       }
   }
 }
 
+function ZoomReporter({ onZoom }: { onZoom: (pct: number) => void }) {
+  const zoom = useStore((s) => s.transform[2])
+  useEffect(() => {
+    onZoom(Math.round(zoom * 100))
+  }, [zoom, onZoom])
+  return null
+}
+
 function CanvasInner() {
+  const { t } = useI18n()
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
   const [quota, setQuota] = useState(loadQuota)
   const [savedHint, setSavedHint] = useState<string | null>(null)
   const [booted, setBooted] = useState(false)
+  const [zoomPct, setZoomPct] = useState(100)
+  const [preview3d, setPreview3d] = useState<{ open: boolean; imageUrl?: string }>({
+    open: false,
+  })
   const { screenToFlowPosition, fitView } = useReactFlow()
   const timers = useRef<number[]>([])
+
+  const labels = useMemo(
+    () => ({
+      upload: t('labelUpload'),
+      prompt: t('labelPrompt'),
+      params: t('labelParams'),
+      generate: t('labelGenerate'),
+      result: t('labelResult'),
+      preview3d: t('labelPreview3d'),
+    }),
+    [t],
+  )
 
   useEffect(() => {
     const saved = loadGraph()
@@ -149,7 +189,7 @@ function CanvasInner() {
     }
     setBooted(true)
     return () => {
-      for (const t of timers.current) window.clearTimeout(t)
+      for (const tmr of timers.current) window.clearTimeout(tmr)
     }
   }, [fitView, setEdges, setNodes])
 
@@ -165,7 +205,7 @@ function CanvasInner() {
   const runGenerate = useCallback(
     (genId: string) => {
       if (quota.used >= quota.total) {
-        patchNodeData(genId, { status: 'error', lastError: '额度已用尽（演示）' })
+        patchNodeData(genId, { status: 'error', lastError: t('quotaExhausted') })
         return
       }
 
@@ -179,15 +219,19 @@ function CanvasInner() {
       const promptData = promptNode?.data as PromptNodeData | undefined
       const paramsData = paramsNode?.data as ParamsNodeData | undefined
       const uploadData = uploadNode?.data as UploadNodeData | undefined
+      const genData = nodes.find((n) => n.id === genId)?.data as GenerateNodeData | undefined
 
       const view: ViewAngle = paramsData?.view ?? 'eye'
       const style: StylePreset = paramsData?.style ?? 'modern'
       const aspect: AspectRatio = paramsData?.aspect ?? '16:9'
       const positive = promptData?.positive ?? PROMPT_PRESETS.facade.positive
       const refPick = pickRefForScapi(uploadData?.imageUrl)
+      const model = genData?.model ?? DEFAULT_MODEL
+      const size = genData?.size ?? DEFAULT_SIZE
 
-      // find result node connected from this generate
-      let resultId = edges.find((e) => e.source === genId && nodes.some((n) => n.id === e.target && n.type === 'result'))?.target
+      let resultId = edges.find(
+        (e) => e.source === genId && nodes.some((n) => n.id === e.target && n.type === 'result'),
+      )?.target
 
       setNodes((nds) => {
         let next = nds.map((n) =>
@@ -210,7 +254,7 @@ function CanvasInner() {
           const pos = gen
             ? { x: gen.position.x + 320, y: gen.position.y - 20 }
             : screenToFlowPosition({ x: 700, y: 240 })
-          const resultNode = createNode('result', pos)
+          const resultNode = createNode('result', pos, labels)
           resultId = resultNode.id
           next = [...next, resultNode]
           setEdges((eds) =>
@@ -221,6 +265,7 @@ function CanvasInner() {
                 target: resultId!,
                 sourceHandle: 'out',
                 targetHandle: 'in',
+                style: { strokeWidth: 2.5, stroke: '#14b8a6' },
               },
               eds,
             ),
@@ -272,7 +317,6 @@ function CanvasInner() {
         })
       }
 
-      // Optional mock fallback when VITE_USE_MOCK=1
       if (shouldUseMockGenerate()) {
         const delay = mockDelayMs()
         const seed = randomSeed()
@@ -304,7 +348,6 @@ function CanvasInner() {
       const started = Date.now()
       const progressTimer = window.setInterval(() => {
         const elapsed = Date.now() - started
-        // Soft progress toward ~90% while waiting on proxy submit+poll
         const p = Math.min(90, 18 + Math.floor(elapsed / 1000) * 3)
         patchNodeData(genId, { status: 'generating', progress: p })
       }, 1200)
@@ -325,10 +368,15 @@ function CanvasInner() {
                       ? 'brutalist architecture'
                       : 'Scandinavian architecture'
           const viewHint =
-            view === 'bird' ? 'aerial bird-eye view' : view === 'elevation' ? 'side elevation view' : 'eye-level perspective'
+            view === 'bird'
+              ? 'aerial bird-eye view'
+              : view === 'elevation'
+                ? 'side elevation view'
+                : 'eye-level perspective'
           const result = await scapiGenerate({
             prompt: `${positive}, ${styleHint}, ${viewHint}`,
-            size: '4K',
+            size,
+            model,
             aspectRatio: aspect,
             ...refPick,
           })
@@ -337,11 +385,22 @@ function CanvasInner() {
         } catch (err) {
           window.clearInterval(progressTimer)
           const msg = err instanceof Error ? err.message : String(err)
-          finishErr(msg || '生成失败')
+          finishErr(msg || t('genFailed'))
         }
       })()
     },
-    [edges, nodes, patchNodeData, quota.total, quota.used, screenToFlowPosition, setEdges, setNodes],
+    [
+      edges,
+      labels,
+      nodes,
+      patchNodeData,
+      quota.total,
+      quota.used,
+      screenToFlowPosition,
+      setEdges,
+      setNodes,
+      t,
+    ],
   )
 
   const useAsRef = useCallback(
@@ -349,21 +408,28 @@ function CanvasInner() {
       const result = nodes.find((n) => n.id === resultId)
       const data = result?.data as ResultNodeData | undefined
       if (!result || !data?.imageUrl) return
-      const upload = createNode('upload', {
-        x: result.position.x + 320,
-        y: result.position.y,
-      })
+      const upload = createNode(
+        'upload',
+        {
+          x: result.position.x + 320,
+          y: result.position.y,
+        },
+        labels,
+      )
       upload.data = {
-        label: '参考 / 户型',
+        label: labels.upload,
         imageUrl: data.imageUrl,
-        fileName: `result-seed-${data.seed ?? 'ref'}.svg`,
+        fileName: `result-seed-${data.seed ?? 'ref'}.png`,
       }
       setNodes((nds) => [...nds, upload])
     },
-    [nodes, setNodes],
+    [labels, nodes, setNodes],
   )
 
-  // inject callbacks into generate/result node data
+  const open3d = useCallback((imageUrl: string) => {
+    setPreview3d({ open: true, imageUrl })
+  }, [])
+
   const nodesWithHandlers = useMemo(() => {
     return nodes.map((n) => {
       if (n.type === 'generate') {
@@ -381,12 +447,13 @@ function CanvasInner() {
           data: {
             ...n.data,
             onUseAsRef: useAsRef,
+            onOpen3D: open3d,
           },
         }
       }
       return n
     })
-  }, [nodes, runGenerate, useAsRef])
+  }, [nodes, open3d, runGenerate, useAsRef])
 
   const nodeTypes: NodeTypes = useMemo(
     () => ({
@@ -395,6 +462,7 @@ function CanvasInner() {
       params: ParamsNode,
       generate: GenerateNode,
       result: ResultNode,
+      preview3d: Preview3DNode,
     }),
     [],
   )
@@ -409,7 +477,7 @@ function CanvasInner() {
             ...connection,
             id: `e-${connection.source}-${connection.target}-${Date.now()}`,
             type: 'default',
-            style: { strokeWidth: 2.25 },
+            style: { strokeWidth: 2.5, stroke: '#94a3b8' },
           },
           eds,
         ),
@@ -428,36 +496,60 @@ function CanvasInner() {
   )
 
   const addNode = useCallback(
-    (type: 'upload' | 'prompt' | 'params' | 'generate' | 'result') => {
+    (type: NodeKind) => {
       const pos = screenToFlowPosition({
-        x: window.innerWidth / 2 + (Math.random() * 80 - 40),
+        x: window.innerWidth / 2 + 80 + (Math.random() * 80 - 40),
         y: window.innerHeight / 2 + (Math.random() * 80 - 40),
       })
-      setNodes((nds) => [...nds, createNode(type, pos)])
+      setNodes((nds) => [...nds, createNode(type, pos, labels)])
     },
-    [screenToFlowPosition, setNodes],
+    [labels, screenToFlowPosition, setNodes],
   )
 
   const handleSave = useCallback(() => {
-    // strip handler functions before persist
     const clean = nodes.map((n) => {
       if (n.type === 'generate' || n.type === 'result') {
-        const { onGenerate: _g, onUseAsRef: _u, ...rest } = n.data as Record<string, unknown>
+        const { onGenerate: _g, onUseAsRef: _u, onOpen3D: _o, ...rest } = n.data as Record<
+          string,
+          unknown
+        >
         return { ...n, data: rest }
       }
       return n
     })
     saveGraph(clean, edges)
-    setSavedHint('已保存到本地')
+    setSavedHint(t('savedHint'))
     window.setTimeout(() => setSavedHint(null), 1800)
+  }, [edges, nodes, t])
+
+  const handleExport = useCallback(() => {
+    const clean = nodes.map((n) => {
+      if (n.type === 'generate' || n.type === 'result') {
+        const { onGenerate: _g, onUseAsRef: _u, onOpen3D: _o, ...rest } = n.data as Record<
+          string,
+          unknown
+        >
+        return { ...n, data: rest }
+      }
+      return n
+    })
+    const blob = new Blob([JSON.stringify({ nodes: clean, edges }, null, 2)], {
+      type: 'application/json',
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `thinking-canvas-${Date.now()}.json`
+    a.click()
+    URL.revokeObjectURL(url)
   }, [edges, nodes])
 
   const handleNew = useCallback(() => {
-    if (!window.confirm('新建画布？当前内容会被清空（本地已保存的也会清除）。')) return
+    if (!window.confirm(t('confirmNew'))) return
     clearGraph()
     setNodes([])
     setEdges([])
-  }, [setEdges, setNodes])
+  }, [setEdges, setNodes, t])
 
   const handleLoadDemo = useCallback(() => {
     setNodes(DEMO_NODES as Node[])
@@ -465,81 +557,100 @@ function CanvasInner() {
     requestAnimationFrame(() => fitView({ padding: 0.2, duration: 400 }))
   }, [fitView, setEdges, setNodes])
 
+  const handleRunAll = useCallback(() => {
+    const gens = nodes.filter((n) => n.type === 'generate')
+    for (const g of gens) runGenerate(g.id)
+  }, [nodes, runGenerate])
+
   return (
-    <div className="relative h-full w-full bg-canvas">
+    <div className="app-shell">
       <TopBar
         quotaUsed={quota.used}
         quotaTotal={quota.total}
         savedHint={savedHint}
+        onRun={handleRunAll}
         onSave={handleSave}
+        onExport={handleExport}
         onNew={handleNew}
         onLoadDemo={handleLoadDemo}
       />
-      <Toolbar onAdd={addNode} />
-      {booted && nodes.length === 0 ? (
-        <EmptyState onLoadDemo={handleLoadDemo} onAddGenerate={() => addNode('generate')} />
-      ) : null}
-      <ReactFlow
-        nodes={nodesWithHandlers}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        isValidConnection={isValidConnection}
-        nodeTypes={nodeTypes}
-        fitView
-        minZoom={0.25}
-        maxZoom={2}
-        proOptions={{ hideAttribution: true }}
-        defaultEdgeOptions={{
-          type: 'default',
-          animated: false,
-          style: { strokeWidth: 2.25 },
-        }}
-        connectionLineStyle={{ stroke: '#d4a84b', strokeWidth: 2 }}
-        connectionRadius={28}
-        snapToGrid
-        snapGrid={[18, 18]}
-        deleteKeyCode={['Backspace', 'Delete']}
-      >
-        <Background
-          id="dots"
-          variant={BackgroundVariant.Dots}
-          gap={18}
-          size={1}
-          color="#2a2a30"
-        />
-        <Background
-          id="cross"
-          variant={BackgroundVariant.Lines}
-          gap={72}
-          lineWidth={0.4}
-          color="#1a1a1e"
-        />
-        <Controls position="bottom-right" />
-        <MiniMap
-          position="bottom-left"
-          pannable
-          zoomable
-          nodeColor={(n) => {
-            switch (n.type) {
-              case 'upload':
-                return '#4ec9b0'
-              case 'prompt':
-                return '#d4a84b'
-              case 'params':
-                return '#9b8cff'
-              case 'generate':
-                return '#f0b429'
-              case 'result':
-                return '#4ec9b0'
-              default:
-                return '#4a4a52'
-            }
-          }}
-          maskColor="rgba(12,12,14,0.78)"
-        />
-      </ReactFlow>
+      <div className="app-main">
+        <NodePalette onAdd={addNode} />
+        <div className="canvas-wrap">
+          {booted && nodes.length === 0 ? (
+            <EmptyState onLoadDemo={handleLoadDemo} onAddGenerate={() => addNode('generate')} />
+          ) : null}
+          <ReactFlow
+            nodes={nodesWithHandlers}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            isValidConnection={isValidConnection}
+            nodeTypes={nodeTypes}
+            fitView
+            minZoom={0.25}
+            maxZoom={2}
+            proOptions={{ hideAttribution: true }}
+            defaultEdgeOptions={{
+              type: 'default',
+              animated: false,
+              style: { strokeWidth: 2.5, stroke: '#94a3b8' },
+            }}
+            connectionLineStyle={{ stroke: '#3b82f6', strokeWidth: 2.25 }}
+            connectionRadius={28}
+            snapToGrid
+            snapGrid={[18, 18]}
+            deleteKeyCode={['Backspace', 'Delete']}
+          >
+            <Background
+              id="dots"
+              variant={BackgroundVariant.Dots}
+              gap={18}
+              size={1.2}
+              color="#c9ced8"
+            />
+            <Controls position="bottom-right" />
+            <MiniMap
+              position="bottom-right"
+              pannable
+              zoomable
+              style={{ marginBottom: 48 }}
+              nodeColor={(n) => {
+                switch (n.type) {
+                  case 'upload':
+                    return '#0ea5e9'
+                  case 'prompt':
+                    return '#a855f7'
+                  case 'params':
+                    return '#8b5cf6'
+                  case 'generate':
+                    return '#f59e0b'
+                  case 'result':
+                    return '#14b8a6'
+                  case 'preview3d':
+                    return '#6366f1'
+                  default:
+                    return '#94a3b8'
+                }
+              }}
+              maskColor="rgba(244,245,247,0.72)"
+            />
+            <ZoomReporter onZoom={setZoomPct} />
+          </ReactFlow>
+        </div>
+      </div>
+      <StatusBar
+        nodeCount={nodes.length}
+        edgeCount={edges.length}
+        zoomPct={zoomPct}
+        savedAgo={savedHint ? 'just now' : null}
+      />
+      <Preview3DModal
+        open={preview3d.open}
+        imageUrl={preview3d.imageUrl}
+        onClose={() => setPreview3d({ open: false })}
+      />
     </div>
   )
 }
