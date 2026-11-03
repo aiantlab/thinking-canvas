@@ -1,4 +1,5 @@
 import type { Edge } from '@xyflow/react'
+import { DEFAULT_MODEL, DEFAULT_SIZE } from './models'
 import type { CanvasNode } from './types'
 
 export const LINE_PROMPT =
@@ -48,6 +49,8 @@ export const DEMO_NODES: CanvasNode[] = [
       label: '生成',
       status: 'done',
       progress: 100,
+      model: DEFAULT_MODEL,
+      size: DEFAULT_SIZE,
     },
   },
   {
@@ -71,7 +74,7 @@ export const DEMO_EDGES: Edge[] = [
     target: 'demo-generate',
     sourceHandle: 'out',
     type: 'default',
-    style: { strokeWidth: 2.25 },
+    style: { strokeWidth: 2.5, stroke: '#94a3b8' },
     targetHandle: 'ref',
   },
   {
@@ -80,7 +83,7 @@ export const DEMO_EDGES: Edge[] = [
     target: 'demo-generate',
     sourceHandle: 'out',
     type: 'default',
-    style: { strokeWidth: 2.25 },
+    style: { strokeWidth: 2.5, stroke: '#94a3b8' },
     targetHandle: 'prompt',
   },
   {
@@ -89,7 +92,7 @@ export const DEMO_EDGES: Edge[] = [
     target: 'demo-generate',
     sourceHandle: 'out',
     type: 'default',
-    style: { strokeWidth: 2.25 },
+    style: { strokeWidth: 2.5, stroke: '#94a3b8' },
     targetHandle: 'params',
   },
   {
@@ -98,7 +101,7 @@ export const DEMO_EDGES: Edge[] = [
     target: 'demo-result',
     sourceHandle: 'out',
     type: 'default',
-    style: { strokeWidth: 2.25 },
+    style: { strokeWidth: 2.5, stroke: '#14b8a6' },
     targetHandle: 'in',
   },
 ]
