@@ -37,6 +37,8 @@ export function clearGraph(): void {
 export type QuotaState = {
   used: number
   total: number
+  unlimited?: boolean
+  maxResolution?: string
 }
 
 export function loadQuota(): QuotaState {
@@ -46,7 +48,7 @@ export function loadQuota(): QuotaState {
   } catch {
     /* ignore */
   }
-  return { used: 3, total: 50 }
+  return { used: 0, total: 10 }
 }
 
 export function saveQuota(q: QuotaState): void {

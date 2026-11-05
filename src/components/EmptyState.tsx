@@ -9,9 +9,19 @@ export function EmptyState({ onLoadDemo, onAddGenerate }: Props) {
   const { t } = useI18n()
   return (
     <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
-      <div className="pointer-events-auto max-w-sm rounded-[16px] border border-border bg-panel p-5 text-center shadow-[0_20px_60px_rgba(15,23,42,0.12)]">
-        <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-[10px] bg-ink text-white">
-          <span className="text-lg">A</span>
+      <div className="pointer-events-auto max-w-md rounded-[16px] border border-border bg-panel p-5 text-center shadow-[0_20px_60px_rgba(15,23,42,0.12)]">
+        <div className="brand-mark brand-mark--splash mb-3 flex items-center justify-center gap-0.5">
+          <img
+            src="/assets/brand-icon.png"
+            alt=""
+            width={40}
+            height={40}
+            className="brand-icon h-10 w-10 shrink-0 object-contain"
+            draggable={false}
+          />
+          <span className="brand-wordmark brand-wordmark--splash">
+            {t('logoTitle')}
+          </span>
         </div>
         <h2 className="text-[15px] font-semibold tracking-wide text-ink">{t('emptyTitle')}</h2>
         <p className="mt-2 text-[12px] leading-relaxed text-muted">{t('emptyBody')}</p>

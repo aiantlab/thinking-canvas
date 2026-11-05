@@ -6,7 +6,7 @@ import { FieldLabel, NodeShell, inputClass, selectClass } from './nodeShell'
 
 export function PromptNode({ id, data }: NodeProps<PromptNodeType>) {
   const { t } = useI18n()
-  const { setNodes } = useReactFlow()
+  const { setNodes, deleteElements } = useReactFlow()
 
   const update = (patch: Partial<typeof data>) => {
     setNodes((nds) =>
@@ -30,6 +30,8 @@ export function PromptNode({ id, data }: NodeProps<PromptNodeType>) {
         accent="#a855f7"
         badge="PROMPT"
         icon={<span className="text-[12px] text-violet">✎</span>}
+        onDelete={() => deleteElements({ nodes: [{ id }] })}
+        deleteLabel={t('deleteNode')}
       >
         <FieldLabel>{t('scenePreset')}</FieldLabel>
         <select
@@ -45,16 +47,20 @@ export function PromptNode({ id, data }: NodeProps<PromptNodeType>) {
         </select>
         <FieldLabel>{t('positive')}</FieldLabel>
         <textarea
-          className={`${inputClass} min-h-[72px] resize-y`}
+          className={`${inputClass} nowheel min-h-[120px] resize-y`}
+          rows={5}
           value={data.positive}
           onChange={(e) => update({ positive: e.target.value })}
+          onPointerDown={(e) => e.stopPropagation()}
           placeholder={t('positivePh')}
         />
         <FieldLabel>{t('negative')}</FieldLabel>
         <textarea
-          className={`${inputClass} min-h-[48px] resize-y`}
+          className={`${inputClass} nowheel min-h-[80px] resize-y`}
+          rows={3}
           value={data.negative}
           onChange={(e) => update({ negative: e.target.value })}
+          onPointerDown={(e) => e.stopPropagation()}
           placeholder={t('negativePh')}
         />
       </NodeShell>

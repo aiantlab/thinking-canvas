@@ -7,4 +7,9 @@ workers_dev = true
 directory = "./dist"
 binding = "ASSETS"
 not_found_handling = "single-page-application"
-run_worker_first = ["/api/*"]
+run_worker_first = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "canno"
+database_id = "8075aa29-04d3-4c79-bc44-e6880e8f3813"

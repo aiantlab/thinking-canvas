@@ -12,6 +12,14 @@ dist
 dist-ssr
 *.local
 
+# Secrets / local env / wrangler
+.wrangler/
+.dev.vars
+.env
+.env.*
+*.pem
+secrets/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -22,3 +30,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Backup / scratch
+*.bak
+*.bak-*

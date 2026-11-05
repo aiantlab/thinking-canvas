@@ -8,8 +8,8 @@
 const MODEL_ENDPOINTS = {
   image_nanoBanana2Lite: 'https://api.scapi.net/api/async/image_nanoBanana2Lite',
   image_nanoBanana2: 'https://api.scapi.net/api/async/image_nanoBanana2',
-  'image_gpt_2.5': 'https://api.scapi.net/api/async/image_gpt_2.5',
   'NanoBanana2.1': 'https://api.scapi.net/api/async/NanoBanana2.1',
+  'image_gpt_2.5': 'https://api.scapi.net/api/async/image_gpt_2.5',
 }
 const DEFAULT_SUBMIT = MODEL_ENDPOINTS.image_nanoBanana2Lite
 
@@ -33,10 +33,154 @@ const POLL_TIMEOUT_MS = 10 * 60 * 1000
 
 /** Same mapping as Vite plugin via output/line_to_render_meta.json */
 const DEMO_PUBLIC_MAP = {
-  '/demo/line_sketch.png': 'https://scapi.net/b2462737c7c140819e801978b50882b3.png',
-  'line_sketch.png': 'https://scapi.net/b2462737c7c140819e801978b50882b3.png',
-  '/demo/line_to_render.png': 'https://scapi.net/febcfbdb46f2410ba953d00ee88e00f0.png',
-  'line_to_render.png': 'https://scapi.net/febcfbdb46f2410ba953d00ee88e00f0.png',
+  '/demo/line_sketch.png': 'https://canno3d.com/demo/line_sketch.png',
+  '/demo/line_to_render.png': 'https://canno3d.com/demo/line_to_render.png',
+  '/templates/facade_brick_render.webp': 'https://canno3d.com/templates/facade_brick_render.webp',
+  '/templates/facade_brick_sketch.webp': 'https://canno3d.com/templates/facade_brick_sketch.webp',
+  '/templates/facade_brick_thumb.webp': 'https://canno3d.com/templates/facade_brick_thumb.webp',
+  '/templates/facade_glass_render.webp': 'https://canno3d.com/templates/facade_glass_render.webp',
+  '/templates/facade_glass_sketch.webp': 'https://canno3d.com/templates/facade_glass_sketch.webp',
+  '/templates/facade_glass_thumb.webp': 'https://canno3d.com/templates/facade_glass_thumb.webp',
+  '/templates/facade_night_render.webp': 'https://canno3d.com/templates/facade_night_render.webp',
+  '/templates/facade_night_sketch.webp': 'https://canno3d.com/templates/facade_night_sketch.webp',
+  '/templates/facade_night_thumb.webp': 'https://canno3d.com/templates/facade_night_thumb.webp',
+  '/templates/facade_white_render.webp': 'https://canno3d.com/templates/facade_white_render.webp',
+  '/templates/facade_white_sketch.webp': 'https://canno3d.com/templates/facade_white_sketch.webp',
+  '/templates/facade_white_thumb.webp': 'https://canno3d.com/templates/facade_white_thumb.webp',
+  '/templates/int_bedroom_render.webp': 'https://canno3d.com/templates/int_bedroom_render.webp',
+  '/templates/int_bedroom_sketch.webp': 'https://canno3d.com/templates/int_bedroom_sketch.webp',
+  '/templates/int_bedroom_thumb.webp': 'https://canno3d.com/templates/int_bedroom_thumb.webp',
+  '/templates/int_kitchen_render.webp': 'https://canno3d.com/templates/int_kitchen_render.webp',
+  '/templates/int_kitchen_sketch.webp': 'https://canno3d.com/templates/int_kitchen_sketch.webp',
+  '/templates/int_kitchen_thumb.webp': 'https://canno3d.com/templates/int_kitchen_thumb.webp',
+  '/templates/int_living_render.webp': 'https://canno3d.com/templates/int_living_render.webp',
+  '/templates/int_living_sketch.webp': 'https://canno3d.com/templates/int_living_sketch.webp',
+  '/templates/int_living_thumb.webp': 'https://canno3d.com/templates/int_living_thumb.webp',
+  '/templates/int_lobby_render.webp': 'https://canno3d.com/templates/int_lobby_render.webp',
+  '/templates/int_lobby_sketch.webp': 'https://canno3d.com/templates/int_lobby_sketch.webp',
+  '/templates/int_lobby_thumb.webp': 'https://canno3d.com/templates/int_lobby_thumb.webp',
+  '/templates/land_garden_render.webp': 'https://canno3d.com/templates/land_garden_render.webp',
+  '/templates/land_garden_sketch.webp': 'https://canno3d.com/templates/land_garden_sketch.webp',
+  '/templates/land_garden_thumb.webp': 'https://canno3d.com/templates/land_garden_thumb.webp',
+  '/templates/land_park_render.webp': 'https://canno3d.com/templates/land_park_render.webp',
+  '/templates/land_park_sketch.webp': 'https://canno3d.com/templates/land_park_sketch.webp',
+  '/templates/land_park_thumb.webp': 'https://canno3d.com/templates/land_park_thumb.webp',
+  '/templates/land_plaza_render.webp': 'https://canno3d.com/templates/land_plaza_render.webp',
+  '/templates/land_plaza_sketch.webp': 'https://canno3d.com/templates/land_plaza_sketch.webp',
+  '/templates/land_plaza_thumb.webp': 'https://canno3d.com/templates/land_plaza_thumb.webp',
+  '/templates/villa_render.webp': 'https://canno3d.com/templates/villa_render.webp',
+  '/templates/villa_sketch.webp': 'https://canno3d.com/templates/villa_sketch.webp',
+  '/templates/villa_thumb.webp': 'https://canno3d.com/templates/villa_thumb.webp',
+  'facade_brick_render.webp': 'https://canno3d.com/templates/facade_brick_render.webp',
+  'facade_brick_sketch.webp': 'https://canno3d.com/templates/facade_brick_sketch.webp',
+  'facade_brick_thumb.webp': 'https://canno3d.com/templates/facade_brick_thumb.webp',
+  'facade_glass_render.webp': 'https://canno3d.com/templates/facade_glass_render.webp',
+  'facade_glass_sketch.webp': 'https://canno3d.com/templates/facade_glass_sketch.webp',
+  'facade_glass_thumb.webp': 'https://canno3d.com/templates/facade_glass_thumb.webp',
+  'facade_night_render.webp': 'https://canno3d.com/templates/facade_night_render.webp',
+  'facade_night_sketch.webp': 'https://canno3d.com/templates/facade_night_sketch.webp',
+  'facade_night_thumb.webp': 'https://canno3d.com/templates/facade_night_thumb.webp',
+  'facade_white_render.webp': 'https://canno3d.com/templates/facade_white_render.webp',
+  'facade_white_sketch.webp': 'https://canno3d.com/templates/facade_white_sketch.webp',
+  'facade_white_thumb.webp': 'https://canno3d.com/templates/facade_white_thumb.webp',
+  'int_bedroom_render.webp': 'https://canno3d.com/templates/int_bedroom_render.webp',
+  'int_bedroom_sketch.webp': 'https://canno3d.com/templates/int_bedroom_sketch.webp',
+  'int_bedroom_thumb.webp': 'https://canno3d.com/templates/int_bedroom_thumb.webp',
+  'int_kitchen_render.webp': 'https://canno3d.com/templates/int_kitchen_render.webp',
+  'int_kitchen_sketch.webp': 'https://canno3d.com/templates/int_kitchen_sketch.webp',
+  'int_kitchen_thumb.webp': 'https://canno3d.com/templates/int_kitchen_thumb.webp',
+  'int_living_render.webp': 'https://canno3d.com/templates/int_living_render.webp',
+  'int_living_sketch.webp': 'https://canno3d.com/templates/int_living_sketch.webp',
+  'int_living_thumb.webp': 'https://canno3d.com/templates/int_living_thumb.webp',
+  'int_lobby_render.webp': 'https://canno3d.com/templates/int_lobby_render.webp',
+  'int_lobby_sketch.webp': 'https://canno3d.com/templates/int_lobby_sketch.webp',
+  'int_lobby_thumb.webp': 'https://canno3d.com/templates/int_lobby_thumb.webp',
+  'land_garden_render.webp': 'https://canno3d.com/templates/land_garden_render.webp',
+  'land_garden_sketch.webp': 'https://canno3d.com/templates/land_garden_sketch.webp',
+  'land_garden_thumb.webp': 'https://canno3d.com/templates/land_garden_thumb.webp',
+  'land_park_render.webp': 'https://canno3d.com/templates/land_park_render.webp',
+  'land_park_sketch.webp': 'https://canno3d.com/templates/land_park_sketch.webp',
+  'land_park_thumb.webp': 'https://canno3d.com/templates/land_park_thumb.webp',
+  'land_plaza_render.webp': 'https://canno3d.com/templates/land_plaza_render.webp',
+  'land_plaza_sketch.webp': 'https://canno3d.com/templates/land_plaza_sketch.webp',
+  'land_plaza_thumb.webp': 'https://canno3d.com/templates/land_plaza_thumb.webp',
+  'line_sketch.png': 'https://canno3d.com/demo/line_sketch.png',
+  'line_to_render.png': 'https://canno3d.com/demo/line_to_render.png',
+  'villa_render.webp': 'https://canno3d.com/templates/villa_render.webp',
+  'villa_sketch.webp': 'https://canno3d.com/templates/villa_sketch.webp',
+  'villa_thumb.webp': 'https://canno3d.com/templates/villa_thumb.webp',
+  '/templates/line_basic_render.webp': 'https://canno3d.com/templates/line_basic_render.webp',
+  'line_basic_render.webp': 'https://canno3d.com/templates/line_basic_render.webp',
+  '/templates/line_basic_sketch.webp': 'https://canno3d.com/templates/line_basic_sketch.webp',
+  'line_basic_sketch.webp': 'https://canno3d.com/templates/line_basic_sketch.webp',
+  '/templates/line_basic_thumb.webp': 'https://canno3d.com/templates/line_basic_thumb.webp',
+  'line_basic_thumb.webp': 'https://canno3d.com/templates/line_basic_thumb.webp',
+  '/templates/plan_master_render.webp': 'https://canno3d.com/templates/plan_master_render.webp',
+  'plan_master_render.webp': 'https://canno3d.com/templates/plan_master_render.webp',
+  '/templates/plan_master_sketch.webp': 'https://canno3d.com/templates/plan_master_sketch.webp',
+  'plan_master_sketch.webp': 'https://canno3d.com/templates/plan_master_sketch.webp',
+  '/templates/plan_master_thumb.webp': 'https://canno3d.com/templates/plan_master_thumb.webp',
+  'plan_master_thumb.webp': 'https://canno3d.com/templates/plan_master_thumb.webp',
+  '/templates/facade_day_render.webp': 'https://canno3d.com/templates/facade_day_render.webp',
+  'facade_day_render.webp': 'https://canno3d.com/templates/facade_day_render.webp',
+  '/templates/facade_day_sketch.webp': 'https://canno3d.com/templates/facade_day_sketch.webp',
+  'facade_day_sketch.webp': 'https://canno3d.com/templates/facade_day_sketch.webp',
+  '/templates/facade_day_thumb.webp': 'https://canno3d.com/templates/facade_day_thumb.webp',
+  'facade_day_thumb.webp': 'https://canno3d.com/templates/facade_day_thumb.webp',
+  '/templates/aerial_block_render.webp': 'https://canno3d.com/templates/aerial_block_render.webp',
+  'aerial_block_render.webp': 'https://canno3d.com/templates/aerial_block_render.webp',
+  '/templates/aerial_block_sketch.webp': 'https://canno3d.com/templates/aerial_block_sketch.webp',
+  'aerial_block_sketch.webp': 'https://canno3d.com/templates/aerial_block_sketch.webp',
+  '/templates/aerial_block_thumb.webp': 'https://canno3d.com/templates/aerial_block_thumb.webp',
+  'aerial_block_thumb.webp': 'https://canno3d.com/templates/aerial_block_thumb.webp',
+  '/templates/int_office_render.webp': 'https://canno3d.com/templates/int_office_render.webp',
+  'int_office_render.webp': 'https://canno3d.com/templates/int_office_render.webp',
+  '/templates/int_office_sketch.webp': 'https://canno3d.com/templates/int_office_sketch.webp',
+  'int_office_sketch.webp': 'https://canno3d.com/templates/int_office_sketch.webp',
+  '/templates/int_office_thumb.webp': 'https://canno3d.com/templates/int_office_thumb.webp',
+  'int_office_thumb.webp': 'https://canno3d.com/templates/int_office_thumb.webp',
+  '/templates/int_dining_render.webp': 'https://canno3d.com/templates/int_dining_render.webp',
+  'int_dining_render.webp': 'https://canno3d.com/templates/int_dining_render.webp',
+  '/templates/int_dining_sketch.webp': 'https://canno3d.com/templates/int_dining_sketch.webp',
+  'int_dining_sketch.webp': 'https://canno3d.com/templates/int_dining_sketch.webp',
+  '/templates/int_dining_thumb.webp': 'https://canno3d.com/templates/int_dining_thumb.webp',
+  'int_dining_thumb.webp': 'https://canno3d.com/templates/int_dining_thumb.webp',
+  '/templates/land_water_render.webp': 'https://canno3d.com/templates/land_water_render.webp',
+  'land_water_render.webp': 'https://canno3d.com/templates/land_water_render.webp',
+  '/templates/land_water_sketch.webp': 'https://canno3d.com/templates/land_water_sketch.webp',
+  'land_water_sketch.webp': 'https://canno3d.com/templates/land_water_sketch.webp',
+  '/templates/land_water_thumb.webp': 'https://canno3d.com/templates/land_water_thumb.webp',
+  'land_water_thumb.webp': 'https://canno3d.com/templates/land_water_thumb.webp',
+  '/templates/land_court_render.webp': 'https://canno3d.com/templates/land_court_render.webp',
+  'land_court_render.webp': 'https://canno3d.com/templates/land_court_render.webp',
+  '/templates/land_court_sketch.webp': 'https://canno3d.com/templates/land_court_sketch.webp',
+  'land_court_sketch.webp': 'https://canno3d.com/templates/land_court_sketch.webp',
+  '/templates/land_court_thumb.webp': 'https://canno3d.com/templates/land_court_thumb.webp',
+  'land_court_thumb.webp': 'https://canno3d.com/templates/land_court_thumb.webp',
+  '/templates/demo_inpaint_render.webp': 'https://canno3d.com/templates/demo_inpaint_render.webp',
+  'demo_inpaint_render.webp': 'https://canno3d.com/templates/demo_inpaint_render.webp',
+  '/templates/demo_inpaint_sketch.webp': 'https://canno3d.com/templates/demo_inpaint_sketch.webp',
+  'demo_inpaint_sketch.webp': 'https://canno3d.com/templates/demo_inpaint_sketch.webp',
+  '/templates/demo_inpaint_thumb.webp': 'https://canno3d.com/templates/demo_inpaint_thumb.webp',
+  'demo_inpaint_thumb.webp': 'https://canno3d.com/templates/demo_inpaint_thumb.webp',
+  '/templates/demo_material_render.webp': 'https://canno3d.com/templates/demo_material_render.webp',
+  'demo_material_render.webp': 'https://canno3d.com/templates/demo_material_render.webp',
+  '/templates/demo_material_sketch.webp': 'https://canno3d.com/templates/demo_material_sketch.webp',
+  'demo_material_sketch.webp': 'https://canno3d.com/templates/demo_material_sketch.webp',
+  '/templates/demo_material_thumb.webp': 'https://canno3d.com/templates/demo_material_thumb.webp',
+  'demo_material_thumb.webp': 'https://canno3d.com/templates/demo_material_thumb.webp',
+  '/templates/demo_multiview_render.webp': 'https://canno3d.com/templates/demo_multiview_render.webp',
+  'demo_multiview_render.webp': 'https://canno3d.com/templates/demo_multiview_render.webp',
+  '/templates/demo_multiview_sketch.webp': 'https://canno3d.com/templates/demo_multiview_sketch.webp',
+  'demo_multiview_sketch.webp': 'https://canno3d.com/templates/demo_multiview_sketch.webp',
+  '/templates/demo_multiview_thumb.webp': 'https://canno3d.com/templates/demo_multiview_thumb.webp',
+  'demo_multiview_thumb.webp': 'https://canno3d.com/templates/demo_multiview_thumb.webp',
+  '/templates/plan_floor_render.webp': 'https://canno3d.com/templates/plan_floor_render.webp',
+  'plan_floor_render.webp': 'https://canno3d.com/templates/plan_floor_render.webp',
+  '/templates/plan_floor_sketch.webp': 'https://canno3d.com/templates/plan_floor_sketch.webp',
+  'plan_floor_sketch.webp': 'https://canno3d.com/templates/plan_floor_sketch.webp',
+  '/templates/plan_floor_thumb.webp': 'https://canno3d.com/templates/plan_floor_thumb.webp',
+  'plan_floor_thumb.webp': 'https://canno3d.com/templates/plan_floor_thumb.webp'
 }
 
 function jsonResponse(status, body) {
@@ -191,7 +335,7 @@ async function handleScapi(request, env) {
   const keys = getKeys(env)
   if (!keys) {
     return jsonResponse(503, {
-      error: '缺少 SUCHUANG_API_KEY / SUCHUANG_SIGN_KEY，无法调用生图服务',
+      error: '生图服务暂不可用，请稍后重试。',
       code: 'NO_KEYS',
     })
   }
@@ -221,13 +365,29 @@ async function handleScapi(request, env) {
     const prompt = typeof body.prompt === 'string' ? body.prompt.trim() : ''
     if (!prompt) return jsonResponse(400, { error: '缺少 prompt' })
 
-    const size = (body.size || DEFAULT_SIZE).toUpperCase()
-    const aspectRatio = body.aspectRatio || DEFAULT_ASPECT
+        const size = String(body.size || DEFAULT_SIZE).toUpperCase()
+    const rawAspect = body.aspectRatio
     const urls = resolveUrls(body)
-    const payload = { prompt, size, aspectRatio }
-    if (urls) payload.urls = urls
-
     const submitBase = resolveSubmitUrl(body)
+    // NanoBanana2.1 / GPT 2.5 reject unbound `size` on SCAPI
+    const omitSize =
+      /\/(NanoBanana2\.1|image_gpt_2\.5)(\?|$)/.test(submitBase) ||
+      body.model === 'NanoBanana2.1' ||
+      body.model === 'image_gpt_2.5'
+    // Explicit ratio → send; 'auto' / empty / absent → omit (let SCAPI infer)
+    const useAspect =
+      typeof rawAspect === 'string' &&
+      rawAspect.trim() !== '' &&
+      rawAspect.trim().toLowerCase() !== 'auto'
+    const payload = omitSize ? { prompt } : { prompt, size }
+    if (useAspect) payload.aspectRatio = String(rawAspect).trim()
+    // forward image count when present (SCAPI `n`, clamp 1–3)
+    const nRaw = body.n ?? body.count
+    const nNum = typeof nRaw === 'number' ? nRaw : Number(nRaw)
+    if (Number.isFinite(nNum) && nNum >= 1 && nNum <= 3) {
+      payload.n = Math.floor(nNum)
+    }
+    if (urls) payload.urls = urls
     const submitUrl = `${submitBase}?key=${encodeURIComponent(keys.key)}`
     const { json } = await scapiFetch('POST', submitUrl, keys.key, keys.secret, payload)
     const code = json.code
@@ -258,7 +418,7 @@ async function handleScapi(request, env) {
     return jsonResponse(200, { imageUrl: polled.imageUrl, taskId })
   }
 
-  return jsonResponse(404, { error: 'unknown scapi route' })
+  return jsonResponse(404, { error: 'unknown api route' })
 }
 
 export default {

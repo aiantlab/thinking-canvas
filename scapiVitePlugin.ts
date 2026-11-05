@@ -17,8 +17,8 @@ const ROOT = path.dirname(fileURLToPath(import.meta.url))
 const MODEL_ENDPOINTS: Record<string, string> = {
   image_nanoBanana2Lite: 'https://api.scapi.net/api/async/image_nanoBanana2Lite',
   image_nanoBanana2: 'https://api.scapi.net/api/async/image_nanoBanana2',
-  'image_gpt_2.5': 'https://api.scapi.net/api/async/image_gpt_2.5',
   'NanoBanana2.1': 'https://api.scapi.net/api/async/NanoBanana2.1',
+  'image_gpt_2.5': 'https://api.scapi.net/api/async/image_gpt_2.5',
 }
 const DEFAULT_SUBMIT = MODEL_ENDPOINTS.image_nanoBanana2Lite
 const DETAIL = 'https://api.scapi.net/api/async/detail'

@@ -1,0 +1,33 @@
+canno3D template preview assets — licensing notes (Asia/Shanghai)
+
+Audit pass 2026-11-05: titles/prompts/params aligned to actual renders;
+mismatched Unsplash assets replaced; sketches/thumbs regenerated from renders.
+
+All *_render.webp from Unsplash (https://unsplash.com/license) or canno3D demo
+derivatives. Sketches/thumbs locally generated (PIL). Do NOT use 建筑学长 assets.
+
+Key Unsplash photo IDs (post-audit):
+- villa: existing /demo line_to_render derivative
+- facade_glass: photo-1600585154340-be6161a56a0c
+- facade_white: photo-1512917774080-9991f1c4c750
+- facade_brick: photo-1605276374104-dee2a0ed3cd6 (brick suburban)
+- facade_night: photo-1486406146926-c627a92ad1ab
+- facade_day: photo-1600573472592-401b489a3cdc (pool terrace)
+- int_living: photo-1600210492486-724fe5c67fb0
+- int_kitchen: photo-1556911220-bff31c812dba
+- int_bedroom: photo-1616594039964-ae9021a400a0
+- int_lobby: photo-1618221195710-dd6b41faaea6 (living hall — title updated)
+- int_office: photo-1497366216548-37526070297c
+- int_dining: photo-1617806118233-18e1de247200
+- land_garden: photo-1558904541-efa843a96f01
+- land_plaza: photo-1467269204594-9661b134dd2b (Rothenburg plaza)
+- land_park: photo-1441974231531-c6227db76b6e
+- land_water: photo-1439066615861-d1af74d74000
+- land_court: photo-1545569341-9eb8b30979d9 (Kyoto autumn vista)
+- line_basic: photo-1600585154526-990dced4db0d
+- aerial_block: photo-1480714378408-67cf0d13bc1b
+- demo_inpaint: photo-1600585154363-67eb9e2e2099 (dusk villa exterior)
+- demo_material: photo-1631679706909-1844bbd07221
+- demo_multiview: photo-1600596542815-ffad4c1539a9
+- plan_master: photo-1477959858617-67f85cf4f1df (lakefront skyline)
+- plan_floor: photo-1600210492493-0946911123ea

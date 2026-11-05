@@ -7,6 +7,10 @@ const STYLE_PALETTE: Record<StylePreset, [string, string, string]> = {
   luxury: ['#1a1410', '#c9a46c', '#4a3728'],
   brutalist: ['#2a2a2a', '#6b6b6b', '#c4c4c4'],
   scandi: ['#e8efe8', '#a8c5a8', '#5a7a5a'],
+  watercolor: ['#c9d6e3', '#7ba3c4', '#e8c9a8'],
+  ink: ['#f7f4ef', '#2a2a2a', '#8a8a8a'],
+  illustration: ['#f4e8d8', '#e07a5f', '#3d405b'],
+  collage: ['#efe6dd', '#d4a373', '#6b705c'],
 }
 
 function escapeXml(s: string): string {

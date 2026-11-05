@@ -7,7 +7,7 @@ import { FieldLabel, NodeShell, btnGhost } from './nodeShell'
 export function UploadNode({ id, data }: NodeProps<UploadNodeType>) {
   const { t } = useI18n()
   const inputRef = useRef<HTMLInputElement>(null)
-  const { setNodes } = useReactFlow()
+  const { setNodes, deleteElements } = useReactFlow()
 
   const update = (patch: Partial<typeof data>) => {
     setNodes((nds) =>
@@ -32,6 +32,8 @@ export function UploadNode({ id, data }: NodeProps<UploadNodeType>) {
         accent="#0ea5e9"
         badge="IMAGE"
         icon={<span className="text-[12px] text-sky">⧉</span>}
+        onDelete={() => deleteElements({ nodes: [{ id }] })}
+        deleteLabel={t('deleteNode')}
       >
         <FieldLabel>{t('uploadTitle')}</FieldLabel>
         <div
